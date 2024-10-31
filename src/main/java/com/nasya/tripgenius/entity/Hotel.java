@@ -37,8 +37,8 @@ public class Hotel {
     private String address;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
-    private HotelCategory category;
+    @JoinColumn(name = "hotel_category", referencedColumnName = "id")
+    private HotelCategory hotelCategory;
 
     @OneToMany(mappedBy = "hotel")
     private List<WishList> wishLists;

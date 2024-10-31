@@ -38,7 +38,7 @@ public class Restaurant {
     private String longtitude;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category", referencedColumnName = "id")
     private RestaurantCategory category;
 
     @OneToMany(mappedBy = "restaurant")

@@ -35,7 +35,7 @@ public class RestaurantCategory {
     @Column(name = "max_price")
     private String maxPrice;
 
-    @OneToMany(mappedBy = "restaurantCategory")
+    @OneToMany(mappedBy = "category")
     private List<Restaurant> restaurants;
 
 }
