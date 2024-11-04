@@ -1,55 +1,45 @@
 package com.nasya.tripgenius.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.nasya.tripgenius.entity.User;
-import com.nasya.tripgenius.model.auth.CreateUserRequest;
-import com.nasya.tripgenius.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+import com.nasya.tripgenius.model.auth.JWTResponse;
+import com.nasya.tripgenius.model.auth.LoginUserRequest;
+import com.nasya.tripgenius.security.JwtProvider;
 
 @Service
 public class AuthService {
 
     @Autowired
-    private UserRepository userRepository;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    private ValidationService validationService;
+    private JwtProvider jwtProvider;
 
-    @Transactional
-    public void register(CreateUserRequest req) {
+    public JWTResponse login(LoginUserRequest req) {
 
-        validationService.validate(req);
+        // 01 - AuthenticationManager is used to authenticate the user
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                req.getUsername(),
+                req.getPassword()));
 
-        boolean isEmailAlreadyUsed = userRepository.findFirstByEmail(req.getEmail()).isPresent();
-        if (isEmailAlreadyUsed) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "EMAIL ALREADY USED");
-        }
+        /*
+         * 02 - SecurityContextHolder is used to allows the rest of the application to
+         * know
+         * that the user is authenticated and can use user data from Authentication
+         * object
+         */
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        boolean isUsernameAlreadyUsed = userRepository.findFirstByUsername(req.getUsername()).isPresent();
-        if (isUsernameAlreadyUsed) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "USERNAME_ALREADY_USED");
-        }
+        // 03 - Generate the token based on username and secret key
+        String token = jwtProvider.generateToken(authentication);
 
-        boolean isPhoneAlreadyUsed = userRepository.findFirstByPhone(req.getPhone()).isPresent();
-        if (isPhoneAlreadyUsed) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PHONE_NUMBER_ALREADY_USED");
-        }
-
-        User user = new User();
-        user.setName(req.getName());
-        user.setUsername(req.getUsername());
-        user.setEmail(req.getEmail());
-        user.setPassword(BCrypt.hashpw(req.getPassword(), BCrypt.gensalt()));
-        user.setPhone(req.getPhone());
-        user.setHomeTown(req.getHomeTown());
-        userRepository.save(user);
-
-    }
+        return JWTResponse.builder().accessToken(token).build();
+    };
 
 }

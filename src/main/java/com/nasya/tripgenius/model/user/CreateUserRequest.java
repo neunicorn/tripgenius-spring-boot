@@ -1,4 +1,4 @@
-package com.nasya.tripgenius.model.auth;
+package com.nasya.tripgenius.model.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

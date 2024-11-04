@@ -9,7 +9,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,10 +53,12 @@ public class User {
 
     private String location;
 
-    private Integer profileCheck;
-
     @Column(name = "profile_picture")
     private String profilePicture;
+
+    @OneToOne
+    @JoinColumn(name = "profilecheck", unique = true)
+    private ProfileCheck profileCheck;
 
     @OneToMany(mappedBy = "user")
     private List<WishList> wishLists;
