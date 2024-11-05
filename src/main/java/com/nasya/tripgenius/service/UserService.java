@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.nasya.tripgenius.entity.User;
+import com.nasya.tripgenius.model.user.ChangePasswordRequest;
 import com.nasya.tripgenius.model.user.CreateUserRequest;
 import com.nasya.tripgenius.repository.UserRepository;
 
@@ -45,4 +46,17 @@ public class UserService {
 
     }
 
+    @Transactional
+    public void updatePassword(ChangePasswordRequest request, String username) {
+
+        User user = userRepository.findFirstByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "USERNAME NOT FOUND"));
+
+        if (BCrypt.checkpw(request.getCurrentPassword(), user.getPassword())) {
+            user.setPassword(BCrypt.hashpw(request.getNewPassword(), BCrypt.gensalt()));
+            userRepository.save(user);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+    }
 }
