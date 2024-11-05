@@ -33,5 +33,6 @@ public class CreateUserRequest {
     @Size(max = 255)
     private String phone;
 
+    @Size(max = 255)
     private String homeTown;
 }

@@ -21,7 +21,12 @@ public class AuthService {
     @Autowired
     private JwtProvider jwtProvider;
 
+    @Autowired
+    private ValidationService validationService;
+
     public JWTResponse login(LoginUserRequest req) {
+
+        validationService.validate(req);
 
         // 01 - AuthenticationManager is used to authenticate the user
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(

@@ -10,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
@@ -31,7 +30,6 @@ public class JwtProvider {
                 .subject(username)
                 .issuedAt(new Date())
                 .expiration(expireDate)
-                .signWith(key(), SignatureAlgorithm.ES256)
                 .compact();
 
         return token;

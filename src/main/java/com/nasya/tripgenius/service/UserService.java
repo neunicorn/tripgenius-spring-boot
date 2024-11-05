@@ -25,14 +25,8 @@ public class UserService {
 
         validationService.validate(req);
 
-        boolean isEmailAlreadyUsed = userRepository.findFirstByEmail(req.getEmail()).isPresent();
-        if (isEmailAlreadyUsed) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "EMAIL ALREADY USED");
-        }
-
-        boolean isUsernameAlreadyUsed = userRepository.findFirstByUsername(req.getUsername()).isPresent();
-        if (isUsernameAlreadyUsed) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "USERNAME_ALREADY_USED");
+        if (userRepository.existsByUsernameOrEmail(req.getUsername(), req.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "EMAIL_OR_USERNAME_ALREADY_USED");
         }
 
         boolean isPhoneAlreadyUsed = userRepository.findFirstByPhone(req.getPhone()).isPresent();
