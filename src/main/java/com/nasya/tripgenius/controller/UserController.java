@@ -44,8 +44,8 @@ public class UserController {
         return WebResponse.<String>builder().data("OK").message("UPDATE PASSWORD SUCCESS").build();
     }
 
-    @PutMapping(path = "/api/v1/user/updateProfile")
-    public WebResponse<UpdateUserResponse> updateProfile(Authentication auth, @RequestBody UpdateUserRequest req) {
+    @PutMapping(path = "/api/v1/user/updateProfile", produces = MediaType.APPLICATION_JSON_VALUE)
+    public WebResponse<UpdateUserResponse> updateProfile(Authentication auth, UpdateUserRequest req) {
 
         UpdateUserResponse res = userService.updateProfile(auth.getName(), req);
 

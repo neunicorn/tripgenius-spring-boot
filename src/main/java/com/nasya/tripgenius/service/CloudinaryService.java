@@ -1,6 +1,5 @@
 package com.nasya.tripgenius.service;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,8 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 import com.cloudinary.Cloudinary;
 
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class CloudinaryService {
 
     @Resource
@@ -21,9 +22,11 @@ public class CloudinaryService {
 
     public String uploadFile(MultipartFile file, String folderName) {
         try {
+
             HashMap<Object, Object> options = new HashMap<>();
             options.put("folder", folderName);
             Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
+
             String publicId = (String) uploadedFile.get("public_id");
             return cloudinary.url().secure(true).generate(publicId);
 
