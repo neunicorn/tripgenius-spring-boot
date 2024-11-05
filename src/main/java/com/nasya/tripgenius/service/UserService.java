@@ -1,5 +1,7 @@
 package com.nasya.tripgenius.service;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -10,6 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.nasya.tripgenius.entity.User;
 import com.nasya.tripgenius.model.user.ChangePasswordRequest;
 import com.nasya.tripgenius.model.user.CreateUserRequest;
+import com.nasya.tripgenius.model.user.UpdateUserRequest;
+import com.nasya.tripgenius.model.user.UpdateUserResponse;
 import com.nasya.tripgenius.repository.UserRepository;
 
 @Service
@@ -20,6 +24,9 @@ public class UserService {
 
     @Autowired
     private ValidationService validationService;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @Transactional
     public void create(CreateUserRequest req) {
@@ -58,5 +65,54 @@ public class UserService {
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    public UpdateUserResponse updateProfile(String username, UpdateUserRequest req) {
+
+        // fetch data user
+        User user = userRepository.findFirstByUsername(username).get();
+
+        if (Objects.nonNull(req.getName())) {
+            user.setName(req.getName());
+        }
+
+        if (Objects.nonNull(req.getUsername())) {
+            if (userRepository.findFirstByUsername(req.getUsername()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "USERNAME CANNOT BE USED");
+            }
+            user.setUsername(req.getUsername());
+        }
+
+        if (Objects.nonNull(req.getEmail())) {
+            if (userRepository.findFirstByEmail(req.getEmail()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "EMAIL CANNOT BE USED");
+            }
+            user.setEmail(req.getEmail());
+        }
+
+        if (Objects.nonNull(req.getPhone())) {
+            if (userRepository.findFirstByPhone(req.getPhone()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PHONE_NUMBER_ALREADY_USED");
+            }
+            user.setEmail(req.getPhone());
+        }
+
+        if (Objects.nonNull(req.getHomeTown())) {
+            user.setHomeTown(req.getHomeTown());
+        }
+
+        if (Objects.nonNull(req.getProfilePicture())) {
+            user.setProfilePicture(cloudinaryService.uploadFile(req.getProfilePicture(), "folder_1"));
+        }
+        userRepository.save(user);
+
+        return UpdateUserResponse.builder()
+                .email(user.getEmail())
+                .name(user.getName())
+                .username(user.getUsername())
+                .phone(user.getPhone())
+                .homeTown(user.getHomeTown())
+                .profilePicture(user.getProfilePicture())
+                .build();
     }
 }
