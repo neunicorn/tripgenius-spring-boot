@@ -29,9 +29,10 @@ public class TempatWisata {
     @Column(name = "place_name")
     private String placeName;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    private Integer category;
+    private String category;
 
     private String city;
 

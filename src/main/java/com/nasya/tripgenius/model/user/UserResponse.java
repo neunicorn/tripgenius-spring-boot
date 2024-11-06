@@ -1,5 +1,7 @@
 package com.nasya.tripgenius.model.user;
 
+import com.nasya.tripgenius.entity.UserGender;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,9 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UpdateUserResponse {
-
-    private String profilePicture;
+public class UserResponse {
 
     private String name;
 
@@ -23,4 +23,9 @@ public class UpdateUserResponse {
 
     private String homeTown;
 
+    private Integer age;
+
+    private UserGender gender;
+
+    private String profilePicture;
 }

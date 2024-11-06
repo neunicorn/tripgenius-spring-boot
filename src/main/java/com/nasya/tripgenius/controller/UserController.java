@@ -12,10 +12,11 @@ import com.nasya.tripgenius.model.WebResponse;
 import com.nasya.tripgenius.model.user.ChangePasswordRequest;
 import com.nasya.tripgenius.model.user.CreateUserRequest;
 import com.nasya.tripgenius.model.user.UpdateUserRequest;
-import com.nasya.tripgenius.model.user.UpdateUserResponse;
+import com.nasya.tripgenius.model.user.UserResponse;
 import com.nasya.tripgenius.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @Slf4j
@@ -23,6 +24,16 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @GetMapping(path = "/api/v1/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    public WebResponse<UserResponse> get(Authentication auth) {
+
+        String username = auth.getName();
+
+        UserResponse res = userService.get(username);
+
+        return WebResponse.<UserResponse>builder().data(res).message("GET_USER_SUCCESS").build();
+    }
 
     @PostMapping(path = "/api/v1/user/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public WebResponse<String> create(@RequestBody CreateUserRequest request) {
@@ -45,11 +56,11 @@ public class UserController {
     }
 
     @PutMapping(path = "/api/v1/user/updateProfile", produces = MediaType.APPLICATION_JSON_VALUE)
-    public WebResponse<UpdateUserResponse> updateProfile(Authentication auth, UpdateUserRequest req) {
+    public WebResponse<UserResponse> updateProfile(Authentication auth, UpdateUserRequest req) {
 
-        UpdateUserResponse res = userService.updateProfile(auth.getName(), req);
+        UserResponse res = userService.updateProfile(auth.getName(), req);
 
-        return WebResponse.<UpdateUserResponse>builder().data(res).message("UPDATE_PROFILE_SUCCESS").build();
+        return WebResponse.<UserResponse>builder().data(res).message("UPDATE_PROFILE_SUCCESS").build();
     }
 
 }

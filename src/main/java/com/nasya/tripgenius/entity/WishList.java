@@ -46,6 +46,6 @@ public class WishList {
     private Transportation transportation;
 
     @ManyToOne
-    @JoinColumn(name = "resto_fk")
+    @JoinColumn(name = "restaurant_fk")
     private Restaurant restaurant;
 }

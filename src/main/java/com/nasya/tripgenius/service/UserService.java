@@ -13,7 +13,7 @@ import com.nasya.tripgenius.entity.User;
 import com.nasya.tripgenius.model.user.ChangePasswordRequest;
 import com.nasya.tripgenius.model.user.CreateUserRequest;
 import com.nasya.tripgenius.model.user.UpdateUserRequest;
-import com.nasya.tripgenius.model.user.UpdateUserResponse;
+import com.nasya.tripgenius.model.user.UserResponse;
 import com.nasya.tripgenius.repository.UserRepository;
 
 @Service
@@ -56,6 +56,8 @@ public class UserService {
     @Transactional
     public void updatePassword(ChangePasswordRequest request, String username) {
 
+        validationService.validate(request);
+
         User user = userRepository.findFirstByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "USERNAME NOT FOUND"));
 
@@ -67,7 +69,10 @@ public class UserService {
         }
     }
 
-    public UpdateUserResponse updateProfile(String username, UpdateUserRequest req) {
+    @Transactional
+    public UserResponse updateProfile(String username, UpdateUserRequest req) {
+
+        validationService.validate(req);
 
         // fetch data user
         User user = userRepository.findFirstByUsername(username).get();
@@ -106,12 +111,38 @@ public class UserService {
         }
         userRepository.save(user);
 
-        return UpdateUserResponse.builder()
+        if (Objects.nonNull(req.getAge())) {
+            user.setAge(req.getAge());
+        }
+
+        if (Objects.nonNull(req.getGender())) {
+            user.setGender(req.getGender());
+        }
+
+        return UserResponse.builder()
                 .email(user.getEmail())
                 .name(user.getName())
                 .username(user.getUsername())
                 .phone(user.getPhone())
                 .homeTown(user.getHomeTown())
+                .gender(user.getGender())
+                .age(user.getAge())
+                .profilePicture(user.getProfilePicture())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse get(String username) {
+        User user = userRepository.findFirstByUsername(username).get();
+
+        return UserResponse.builder()
+                .name(user.getName())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .homeTown(user.getHomeTown())
+                .gender(user.getGender())
+                .age(user.getAge())
                 .profilePicture(user.getProfilePicture())
                 .build();
     }
