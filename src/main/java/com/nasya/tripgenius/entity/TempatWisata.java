@@ -2,6 +2,9 @@ package com.nasya.tripgenius.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -45,6 +48,7 @@ public class TempatWisata {
     private String coordinate;
 
     @OneToMany(mappedBy = "tempatWisata")
+    @JsonIgnore
     private List<WishList> wishLists;
 
 }

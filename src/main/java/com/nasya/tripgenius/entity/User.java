@@ -2,6 +2,9 @@ package com.nasya.tripgenius.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,9 +12,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class User {
 
     private String name;
 
+    @JsonIgnoreProperties("password")
     @Column(unique = true)
     private String username;
 
@@ -56,10 +58,7 @@ public class User {
     @Column(name = "profile_picture")
     private String profilePicture;
 
-    @OneToOne
-    @JoinColumn(name = "profilecheck", unique = true)
-    private ProfileCheck profileCheck;
-
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<WishList> wishLists;
 }

@@ -1,20 +1,22 @@
 package com.nasya.tripgenius.service;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.nasya.tripgenius.entity.Hotel;
 import com.nasya.tripgenius.entity.Restaurant;
-import com.nasya.tripgenius.entity.Status;
 import com.nasya.tripgenius.entity.TempatWisata;
 import com.nasya.tripgenius.entity.Transportation;
 import com.nasya.tripgenius.entity.User;
 import com.nasya.tripgenius.entity.WishList;
 import com.nasya.tripgenius.model.wishlist.CreateWishListRequest;
+import com.nasya.tripgenius.model.wishlist.WishListResponse;
 import com.nasya.tripgenius.repository.HotelRepository;
 import com.nasya.tripgenius.repository.RestaurantRepository;
 import com.nasya.tripgenius.repository.TempatWisataRepository;
@@ -49,6 +51,18 @@ public class WishListService {
     @Autowired
     private ValidationService validationService;
 
+    private WishListResponse toWishListResponse(WishList wishList) {
+
+        return WishListResponse.builder()
+                .hotel(wishList.getHotel())
+                .destinasi(wishList.getTempatWisata())
+                .restaurant(wishList.getRestaurant())
+                .transportation(wishList.getTransportation())
+                .status(wishList.getStatus())
+                .build();
+    }
+
+    @Transactional
     public void create(String username, CreateWishListRequest req) {
 
         log.info("Request + " + req.toString());
@@ -99,10 +113,28 @@ public class WishListService {
             wishList.setTransportation(transportation);
         }
 
-        wishList.setStatus(Status.True);
+        wishList.setStatus(true);
 
         wishlistRepository.save(wishList);
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<WishListResponse> get(String username) {
+        User user = userRepository.findFirstByUsername(username).get();
+
+        List<WishList> res = wishlistRepository.findByUserAndStatus(user, true);
+
+        return res.stream().map(data -> toWishListResponse(data)).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public WishListResponse getDetail(Long id) {
+
+        WishList res = wishlistRepository.findFirstById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "DETAIL LIST NOT FOUND"));
+
+        return toWishListResponse(res);
     }
 
 }

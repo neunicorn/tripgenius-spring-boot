@@ -1,8 +1,11 @@
 package com.nasya.tripgenius.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,26 +29,25 @@ public class WishList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    private Boolean status;
 
-    @ManyToOne
-    @JoinColumn(name = "wisata_fk")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "wisata_fk", referencedColumnName = "id")
     private TempatWisata tempatWisata;
 
-    @ManyToOne
-    @JoinColumn(name = "hotel_fk")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "hotel_fk", referencedColumnName = "id")
     private Hotel hotel;
 
     @ManyToOne
-    @JoinColumn(name = "uid_fk")
+    @JoinColumn(name = "uid_fk", referencedColumnName = "id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "transportation_fk")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "transportation_fk", referencedColumnName = "id")
     private Transportation transportation;
 
-    @ManyToOne
-    @JoinColumn(name = "restaurant_fk")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "restaurant_fk", referencedColumnName = "id")
     private Restaurant restaurant;
 }
